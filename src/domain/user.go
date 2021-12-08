@@ -1,10 +1,18 @@
 package domain
 
+import (
+	"gorm.io/gorm"
+	"time"
+)
+
 type User struct {
-	ID       string `json:"id" bson:"_id"`
-	Name     string `json:"name" bson:"name"`
-	Email    string `json:"email" bson:"email"`
-	Password string `json:"-" bson:"-"`
+	ID        uint           `gorm:"primaryKey" json:"id"`
+	Name      string         `json:"name" `
+	Email     string         `json:"email"`
+	Password  string         `json:"-"`
+	CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 }
 
 type UserRepository interface {
