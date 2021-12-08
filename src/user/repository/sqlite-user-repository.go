@@ -6,15 +6,15 @@ import (
 	"strconv"
 )
 
-type sqliteUserRepository struct {
+type SqliteUserRepository struct {
 	db *gorm.DB
 }
 
-func NewSQLiteUserRepository(database *gorm.DB) *sqliteUserRepository {
-	return &sqliteUserRepository{database}
+func NewSQLiteUserRepository(database *gorm.DB) *SqliteUserRepository {
+	return &SqliteUserRepository{database}
 }
 
-func (r *sqliteUserRepository) FindById(id string) (domain.User, bool, error) {
+func (r *SqliteUserRepository) FindById(id string) (domain.User, bool, error) {
 	user := domain.User{}
 	result := r.db.First(&user, "id=?", id)
 	if result.Error != nil {
@@ -26,7 +26,7 @@ func (r *sqliteUserRepository) FindById(id string) (domain.User, bool, error) {
 	return user, true, nil
 }
 
-func (r *sqliteUserRepository) FindByEmail(email string) (domain.User, bool, error) {
+func (r *SqliteUserRepository) FindByEmail(email string) (domain.User, bool, error) {
 	user := domain.User{}
 	result := r.db.First(&user, "email=?", email)
 	if result.Error != nil {
@@ -38,7 +38,7 @@ func (r *sqliteUserRepository) FindByEmail(email string) (domain.User, bool, err
 	return user, true, nil
 }
 
-func (r *sqliteUserRepository) Create(name, email, password string) (string, error) {
+func (r *SqliteUserRepository) Create(name, email, password string) (string, error) {
 	user := domain.User{
 		Name:     name,
 		Email:    email,
