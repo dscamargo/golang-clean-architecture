@@ -8,10 +8,10 @@ import (
 	"testing"
 )
 
-func makeSut() UserUsecase {
+func makeSut() CreateUserUsecase {
 	repo := repository.NewInMemRepo()
 	hasher := adapters.NewHasher()
-	return NewUserUsecase(repo, hasher)
+	return NewCreateUserUsecase(repo, hasher)
 }
 
 func makeFakeUser() map[string]string {

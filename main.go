@@ -1,38 +1,54 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"github.com/dscamargo/crud-clean-architecture/src/adapters"
+	"github.com/dscamargo/crud-clean-architecture/src/domain"
 	"github.com/dscamargo/crud-clean-architecture/src/presentation/controllers"
 	"github.com/dscamargo/crud-clean-architecture/src/user/repository"
 	"github.com/dscamargo/crud-clean-architecture/src/user/usecase"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"log"
+	"os"
 	"time"
 )
 
-func connectMongoDB() (*mongo.Database, context.CancelFunc) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	conn, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+func connectDB() *gorm.DB {
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Info,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  false,
+		},
+	)
+
+	db, err := gorm.Open(sqlite.Open("account.db"), &gorm.Config{
+		Logger: newLogger,
+	})
+
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("[Database] - Error in connection", err)
 	}
-	db := conn.Database("golang-test")
-	fmt.Print("[Database] Connected")
-	return db, cancel
+	return db
 }
 
 func main() {
-	db, cancel := connectMongoDB()
-	defer cancel()
+	db := connectDB()
+	err := db.AutoMigrate(&domain.User{})
+
+	if err != nil {
+		log.Fatalln("[AutoMigrate] - Error in AutoMigrate", err)
+	}
 
 	app := gin.Default()
 
 	//Dependencias
-	userRepo := repository.NewMongoUserRepository(db)
+	userRepo := repository.NewSQLiteUserRepository(db)
 	hasher := adapters.NewHasher()
 
 	//Usecases
@@ -45,7 +61,7 @@ func main() {
 	app.POST("/users", userController.CreateUser)
 	app.GET("/users/:id", userController.GetUser)
 
-	err := app.Run(":8090")
+	err = app.Run(":8090")
 	if err != nil {
 		log.Fatalln(err)
 	}

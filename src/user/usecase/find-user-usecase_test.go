@@ -4,6 +4,7 @@ import (
 	"github.com/dscamargo/crud-clean-architecture/src/domain"
 	"github.com/dscamargo/crud-clean-architecture/src/user/repository"
 	"github.com/stretchr/testify/assert"
+	"strconv"
 	"testing"
 )
 
@@ -25,7 +26,7 @@ func TestUserUsecase_GetUserById_Success(t *testing.T) {
 	assert.Nil(t, err)
 	user, err := sut.GetUserById(userId)
 	assert.Nil(t, err)
-	assert.Equal(t, user.ID, userId)
+	assert.Equal(t, strconv.FormatUint(uint64(user.ID), 10), userId)
 	assert.Equal(t, user.Name, "any-name")
 	assert.Equal(t, user.Email, "any-email")
 	assert.Equal(t, user.Password, "any-password")

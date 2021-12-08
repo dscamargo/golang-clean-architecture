@@ -2,7 +2,9 @@ package repository
 
 import (
 	"github.com/dscamargo/crud-clean-architecture/src/domain"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"gorm.io/gorm"
+	"strconv"
+	"time"
 )
 
 type inmem struct {
@@ -19,7 +21,7 @@ func (m *inmem) FindById(id string) (domain.User, bool, error) {
 	user := domain.User{}
 	found := false
 	for _, item := range m.users {
-		if item.ID == id {
+		if strconv.FormatUint(uint64(item.ID), 10) == id {
 			user = item
 			found = true
 		}
@@ -46,11 +48,14 @@ func (m *inmem) FindByEmail(email string) (domain.User, bool, error) {
 
 func (m *inmem) Create(name, email, password string) (string, error) {
 	user := domain.User{
-		ID:       primitive.NewObjectID().String(),
-		Name:     name,
-		Email:    email,
-		Password: password,
+		ID:        1,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		DeletedAt: gorm.DeletedAt{},
+		Name:      name,
+		Email:     email,
+		Password:  password,
 	}
 	m.users = append(m.users, user)
-	return user.ID, nil
+	return strconv.FormatUint(uint64(user.ID), 10), nil
 }
