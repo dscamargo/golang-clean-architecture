@@ -39,12 +39,10 @@ func connectDB() *gorm.DB {
 
 func main() {
 	db := connectDB()
-	err := db.AutoMigrate(&domain.User{})
-
+	err := db.AutoMigrate(&domain.User{}, &domain.Address{})
 	if err != nil {
 		log.Fatalln("[AutoMigrate] - Error in AutoMigrate", err)
 	}
-
 	app := gin.Default()
 
 	//Dependencias
